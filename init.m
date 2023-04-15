@@ -102,6 +102,7 @@ db$Close[dbname_] :=
               If[KeyExistsQ[db$Info,dbname],
                  (* Close DB *)
                  DBClose[ManagedLibraryExpressionID@db$Info[dbname]];
+                 KeyDropFrom[db$Info,dbname];
                ,
                  Message[General::nodb, dbname];
               ]
