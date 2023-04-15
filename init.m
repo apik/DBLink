@@ -18,7 +18,7 @@ db$Close::usage="db$Close[\"dbname\"] - Close DB with name \"dbname\".";
 
 db$Set::usage="db$Set[\"dbname\", \"key\" -> \"value\"] - set \"key\"=\"value\".
                         Options:
-                               \"Force\" - owervrite existing key value";
+                               \"Force\" - overwrite existing entry";
 db$Get::usage="db$Get[\"dbname\", \"key\"] - Retrive value for specific key \"key\".
                         Options:
                                \"NotFoundValue\" - expression to return, when key not found.";
