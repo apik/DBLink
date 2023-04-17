@@ -23,6 +23,8 @@ db$Get::usage="db$Get[\"dbname\", \"key\"] - Retrive value for specific key \"ke
                         Options:
                                \"NotFoundValue\" - expression to return, when key not found.";
 
+db$Check::usage="db$Check[\"dbname\", \"key\"] - True if key \"key\" exists in DB.";
+
 db$Size::usage="db$Size[\"dbname\"] - get number of keys in DB.";
 
 Begin["`Private`"];
@@ -53,6 +55,11 @@ DBGet   = LibraryFunctionLoad["lib/DBLink.so",
                               "DBGet",
                               {Integer, "UTF8String"},
                               "DataStore"];
+
+DBCheck = LibraryFunctionLoad["lib/DBLink.so",
+                              "DBCheck",
+                              {Integer, "UTF8String"},
+                              "Boolean"];
 
 DBSize  = LibraryFunctionLoad["lib/DBLink.so",
                               "DBSize",
@@ -127,6 +134,16 @@ db$Get[dbname_, key_String, OptionsPattern[]] :=
                     val,
                     OptionValue["NotFoundValue"]
                  ]
+               ,
+                 Message[General::nodb, dbname];
+                 None
+              ]
+        ];
+
+db$Check[dbname_, key_String] :=
+        Block[{nkeys,val},
+              If[KeyExistsQ[db$Info,dbname],
+                 DBCheck[ManagedLibraryExpressionID@db$Info[dbname], key]
                ,
                  Message[General::nodb, dbname];
                  None

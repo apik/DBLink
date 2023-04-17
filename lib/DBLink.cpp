@@ -47,6 +47,11 @@ public:
     return db.get(key, &value);
   }
 
+  int32_t  check(const std::string & key)
+  {
+    return db.check(key);
+  }
+
   bool has_key(const std::string & key, std::string & value)
   {
     return db.get(key, &value);
@@ -169,6 +174,24 @@ EXTERN_C DLLEXPORT int DBGet(WolframLibraryData libData, mint Argc, MArgument *A
     }
 
   MArgument_setDataStore(res, ds_out);
+  
+  return LIBRARY_NO_ERROR;
+}
+
+EXTERN_C DLLEXPORT int DBCheck(WolframLibraryData libData, mint Argc, MArgument *Args, MArgument res)
+{
+  if (Argc != 2) return LIBRARY_FUNCTION_ERROR;
+  mint id = MArgument_getInteger(Args[0]);
+  
+  DB *T = map[id];
+  if (T == nullptr) return LIBRARY_FUNCTION_ERROR;
+  
+  std::string key(MArgument_getUTF8String(Args[1]));
+
+  if(T->check(key) < 0)
+    MArgument_setBoolean(res,False);
+  else
+    MArgument_setBoolean(res,True);
   
   return LIBRARY_NO_ERROR;
 }
