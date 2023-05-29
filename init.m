@@ -27,6 +27,8 @@ db$Check::usage="db$Check[\"dbname\", \"key\"] - True if key \"key\" exists in D
 
 db$Size::usage="db$Size[\"dbname\"] - get number of keys in DB.";
 
+db$DumpKeys::usage="db$DumpKeys[\"dbname\", \"fname\"] - save list of keys in DB \"dbname\" to file \"fname\".";
+
 Begin["`Private`"];
 AppendTo[$Path, DirectoryName[$InputFileName]];
 (* ------------------------------------------------------------------ *)
@@ -64,6 +66,11 @@ DBCheck = LibraryFunctionLoad["lib/DBLink.so",
 DBSize  = LibraryFunctionLoad["lib/DBLink.so",
                               "DBSize",
                               {Integer},
+                              Integer];
+
+DBDump  = LibraryFunctionLoad["lib/DBLink.so",
+                              "DBDump",
+                              {Integer, "UTF8String"},
                               Integer];
 
 (* ------------------------------------------------------------------ *)
@@ -154,6 +161,16 @@ db$Size[dbname_] :=
         Block[{},
               If[KeyExistsQ[db$Info,dbname],
                  DBSize[ManagedLibraryExpressionID@db$Info[dbname]]
+               ,
+                 Message[General::nodb, dbname];
+                 None
+              ]              
+        ]
+
+db$DumpKeys[dbname_, fname_String] :=
+        Block[{},
+              If[KeyExistsQ[db$Info,dbname],
+                 DBDump[ManagedLibraryExpressionID@db$Info[dbname], fname]
                ,
                  Message[General::nodb, dbname];
                  None

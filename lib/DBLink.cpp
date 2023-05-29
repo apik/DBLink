@@ -62,6 +62,31 @@ public:
     return db.count();
   }
 
+  mint key_dump(const std::string & fname)
+  {
+    mint n_keys = 0;
+
+    std::ofstream keys_f (fname);
+    if (keys_f.is_open())
+      {
+        // traverse records
+        kyotocabinet::HashDB::Cursor* cur = db.cursor();
+        cur->jump();
+        string ckey;
+        while (cur->get_key(&ckey, true))
+          {
+            keys_f << ckey << endl;
+            n_keys++;
+          }
+        delete cur;
+        keys_f.close();
+      }
+    else
+      cerr << "Unable to open file";
+
+    return n_keys;
+  }
+
   void error()
   {
     cerr << "Error: " << db.error().name() << endl;
@@ -235,6 +260,20 @@ EXTERN_C DLLEXPORT int DBSize(WolframLibraryData libData, mint Argc, MArgument *
   if (T == nullptr) return LIBRARY_FUNCTION_ERROR;
 
   MArgument_setInteger(res, T->size());
+  return LIBRARY_NO_ERROR;
+}
+
+EXTERN_C DLLEXPORT int DBDump(WolframLibraryData libData, mint Argc, MArgument *Args, MArgument res)
+{
+  if (Argc != 2) return LIBRARY_FUNCTION_ERROR;
+  mint id = MArgument_getInteger(Args[0]);
+
+  DB *T = map[id];
+  if (T == nullptr) return LIBRARY_FUNCTION_ERROR;
+
+  std::string   fname(MArgument_getUTF8String(Args[1]));
+
+  MArgument_setInteger(res, T->key_dump(fname));
   return LIBRARY_NO_ERROR;
 }
 
